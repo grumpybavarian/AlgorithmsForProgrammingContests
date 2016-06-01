@@ -1,0 +1,259 @@
+//Code used from https://web.stanford.edu/~liszt90/acm/notebook.html#file3
+#include <cmath>
+#include <vector>
+#include <iostream>
+#include <queue>
+#include <string>
+#include <climits>
+#include <time.h>
+#include <map>
+#include <stack>
+using namespace std;
+
+typedef long long LL;
+
+struct Edge {
+int from, to, cap, flow, index;
+Edge(int from, int to, int cap, int flow, int index) :
+from(from), to(to), cap(cap), flow(flow), index(index) {}
+LL rcap() { return cap - flow; }
+};
+
+
+struct PushRelabel {
+int N;
+vector<vector<Edge> > G;
+vector<LL> excess;
+vector<int> dist, active, count;
+queue<int> Q;
+
+PushRelabel(int N) : N(N), G(N), excess(N), dist(N), active(N), count(2*N) {}
+
+void AddEdge(int from, int to, int cap) {
+G[from].push_back(Edge(from, to, cap, 0, G[to].size()));
+if (from == to) G[from].back().index++;
+G[to].push_back(Edge(to, from, 0, 0, G[from].size() - 1));
+}
+
+void Enqueue(int v) {
+if (!active[v] && excess[v] > 0) { active[v] = true; Q.push(v); }
+}
+
+void Push(Edge &e) {
+int amt = int(min(excess[e.from], LL(e.cap - e.flow)));
+if (dist[e.from] <= dist[e.to] || amt == 0) return;
+e.flow += amt;
+G[e.to][e.index].flow -= amt;
+excess[e.to] += amt;
+excess[e.from] -= amt;
+Enqueue(e.to);
+}
+
+void Gap(int k) {
+for (int v = 0; v < N; v++) {
+if (dist[v] < k) continue;
+count[dist[v]]--;
+dist[v] = max(dist[v], N+1);
+count[dist[v]]++;
+Enqueue(v);
+}
+}
+
+void Relabel(int v) {
+count[dist[v]]--;
+dist[v] = 2*N;
+for (int i = 0; i < G[v].size(); i++)
+if (G[v][i].cap - G[v][i].flow > 0)
+dist[v] = min(dist[v], dist[G[v][i].to] + 1);
+count[dist[v]]++;
+Enqueue(v);
+}
+
+void Discharge(int v) {
+for (int i = 0; excess[v] > 0 && i < G[v].size(); i++) Push(G[v][i]);
+if (excess[v] > 0) {
+if (count[dist[v]] == 1)
+Gap(dist[v]);
+else
+Relabel(v);
+}
+}
+
+LL GetMaxFlow(int s, int t) {
+count[0] = N-1;
+count[N] = 1;
+dist[s] = N;
+active[s] = active[t] = true;
+for (int i = 0; i < G[s].size(); i++) {
+excess[s] += G[s][i].cap;
+Push(G[s][i]);
+}
+
+while (!Q.empty()) {
+int v = Q.front();
+Q.pop();
+active[v] = false;
+Discharge(v);
+}
+
+LL totflow = 0;
+for (int i = 0; i < G[s].size(); i++) totflow += G[s][i].flow;
+return totflow;
+}
+};
+
+
+int main() {
+ios_base::sync_with_stdio(false);
+int t;
+cin >> t;
+long double start = clock();
+for (int ti=1; ti<=t; ++ti) {
+int w,h,n;
+cin >> w >> h >> n;
+int anzNodes = w*h+2;
+PushRelabel p(anzNodes);
+//source : anzNodes - 2
+//sink   : anzNodes - 1
+vector<vector<int>> maze(h, vector<int>(w,0));
+
+
+//city
+int xc,yc,wc,hc;
+cin >> xc >> yc >> wc >> hc;
+for (int i=0; i<hc; ++i) {
+for (int j=0; j<wc; ++j) {
+maze[yc-1+i][xc-1+j] = -1;
+}
+}
+
+//impassable locations
+for (int i_n=0; i_n<n; ++i_n) {
+int xi,yi,wi,hi;
+cin >> xi >> yi >> wi >> hi;
+for (int i=0; i<hi; ++i) {
+for (int j=0; j<wi; ++j) {
+maze[yi-1+i][xi-1+j] = -1;
+}
+}
+}
+
+//do dfs on graph
+stack<pair<int,int>> q;
+map<pair<int,int>,pair<int,int>> parent;
+map<pair<int,int>,bool> visited;
+int topSortNumber = 0;
+for (int i=0; i<yc; ++i) {
+if (maze[i][w-1] != -1) {
+pair<int,int> p = {i,w-1};
+maze[i][w-1] = ++topSortNumber;
+q.push({i,w-1});
+visited[{i,w-1}] = true;
+}
+}
+while (!q.empty()) {
+pair<int,int> next = q.top();
+q.pop();
+int x = next.first;
+int y = next.second;
+vector<pair<int,int>> neighbors = {{x+1,y},{x-1,y},{x,y+1},{x,y-1}};
+for (auto item : neighbors) {
+int xn = item.first;
+int yn = item.second;
+if (xn<0 or xn>=h or yn<0 or yn>=w or maze[xn][yn] == -1) continue;
+p.AddEdge(x*w+y, xn*w+yn, INT_MAX);
+if (!visited[item]) {
+visited[item] = true;
+q.push(item);
+parent[item] = next;
+maze[xn][yn] = ++topSortNumber;
+}
+}
+for (int i=0; i<h; ++i) {
+for (int j=0; j<w; ++j) {
+cout << maze[i][j] << " ";
+}
+cout << endl;
+}
+cout << endl;
+}
+
+
+//add source edges
+for (int i=0; i<yc-1; ++i) {
+if (maze[i][w-1] != -1)
+p.AddEdge(anzNodes-2, i*w+w-1, INT_MAX);
+}
+//add target edges
+for (int i=yc-1+hc; i<h; ++i) {
+if (maze[i][w-1] != -1)
+p.AddEdge(i*w+w-1, anzNodes-1, 1);
+}
+
+cout << "Case #" << ti << ": " << p.GetMaxFlow(anzNodes-2, anzNodes-1)<< endl;
+
+
+
+
+
+}
+long double end = clock() - start;
+end = end / CLOCKS_PER_SEC;
+cout << end << endl;
+return 0;
+}
+
+/*
+3
+5 6 1 3 4 3 1 1 1 1 1
+4 6 4 3 3 2 2 3 2 2 1 2 3 1 1 1 5 1 1 3 6 2 1
+8 10 5 8 3 1 6 2 2 5 1 2 3 1 3 6 3 1 1 4 4 1 1 4 5 4 1
+*/
+/*
+7
+7 7 0 4 4 4 3
+4 7 0 3 2 2 4
+7 6 0 4 3 4 2
+3 7 2 2 4 2 3 1 7 1 1 2 1 2 3
+12 12 1 5 5 8 6 4 3 4 1
+11 9 2 5 3 7 4 7 8 4 1 9 7 2 1
+5 8 2 3 2 3 4 4 8 2 1 2 3 1 3
+*/
+
+/*
+10
+200 200 0
+51 26 150 150
+
+200 200 0
+51 26 150 150
+
+200 200 0
+51 26 150 150
+
+200 200 0
+51 26 150 150
+
+200 200 0
+51 26 150 150
+
+200 200 0
+51 26 150 150
+
+200 200 0
+51 26 150 150
+
+200 200 0
+51 26 150 150
+
+200 200 0
+51 26 150 150
+
+200 200 0
+51 26 150 150
+*/
+/*
+1
+1000 1000 0
+51 26 950 950
+*/

@@ -1,0 +1,99 @@
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <queue>
+#include <climits>
+#include <set>
+#include <math.h>
+using namespace std;
+
+struct edge {
+
+int b;
+long double r;
+};
+
+int main() {
+ios_base::sync_with_stdio(false);
+int t;
+cin >> t;
+long double min_val = 0;
+for (int ti=1; ti<=t; ++ti) {
+int n,m;
+cin >> n >> m;
+//graph as adjacency list
+vector<vector<edge> > adj(n);
+for (int i=0; i<m; ++i) {
+int v,w;
+long double c;
+cin >> v >> w >> c;
+if (c < 1.0) {
+min_val += log(c);
+}
+adj[v-1].push_back(edge {w-1,c});
+}
+//Bellman-Ford-Algorithm
+vector<long double> dist(n, INT_MAX);
+vector<bool> visited(n);
+vector<bool> inQueue(n);
+queue<int> q;
+q.push(0);
+dist[0] = 0;
+visited[0] = true;
+int phase = 0;
+bool jackpot = false;
+while (!q.empty() && !jackpot) {
+int node = q.front();
+q.pop();
+inQueue[node] = false;
+for (edge e : adj[node]) {
+visited[e.b] = true;
+if (dist[e.b] > dist[node] + log(e.r)) {
+dist[e.b] = dist[node] + log(e.r);
+if (dist[e.b] < min_val) {
+jackpot = true;
+break;
+}
+if (!inQueue[e.b]) {
+q.push(e.b);
+inQueue[e.b] = true;
+}
+}
+}
+}
+if (jackpot)
+cout << "Case #" << ti << ": Jackpot\n";
+else if (!visited[n-1])
+cout << "Case #" << ti << ": impossible\n";
+else
+cout << "Case #" << ti << ": " << exp(dist[n-1]) << "\n";
+}
+return 0;
+}/*
+2
+4 5
+1 2 0.6 1 4 2.0 2 3 0.4 3 1 4.5 4 3 0.4
+4 5
+1 2 0.6 1 4 2.0 2 3 0.4 3 1 3.0 4 3 0.4
+*/
+/*
+5
+2 9
+2 1 4.957186803129981 2 1 6.620619419446655 2 1 16.500616470488563 2 1 16.834882454878887 2 1 24.074376322813904 1 2 13.71666475028296 1 2 14.55634943211089 1 2 6.05062550202779
+2 1 18.99786857145586
+6 9
+5 3 24.910561875958397 2 4 16.337410133859446 6 3 18.011060835524688 3 6 13.413097310357303 4 2 3.7390827947187093 4 5 22.089326051818336 3 2 8.784604852440975 4 6 1.685891245038171 1 4 19.846182503324552
+4 9
+2 1 13.478209011592549 4 3 10.78210513487828 3 2 11.415471460053217 1 2 21.063223442280034 2 3 15.274734498041306 2 3 20.76763136664618 1 2 20.060318575840384 3 2 24.251280818656497 3 4 10.110479393764333
+4 3
+3 2 7.345063986818906 2 4 2.6023843675573866 2 1 19.019918301109033
+6 2
+4 1 2.0813064263003027 2 3 1.668983349133521
+*/
+/*
+1 3 4
+1 3 0.9
+1 2 2.0
+2 3 1.5
+1 3 1.2
+*/

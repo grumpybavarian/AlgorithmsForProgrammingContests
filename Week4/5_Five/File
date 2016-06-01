@@ -1,0 +1,224 @@
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <set>
+#include <climits>
+#include <map>
+#include <queue>
+#include <cmath>
+using namespace std;
+
+//defines a constant for wall fields
+const pair<int,int> wall = pair<int,int>(-1,-1);
+
+int main() {
+ios_base::sync_with_stdio(false);
+int t;
+cin >> t;
+for (int ti=1; ti<=t; ++ti) {
+int w,h;
+cin >> w >> h;
+//labyrinth matrix
+vector<vector<pair<int,int> > > maze(h, vector<pair<int,int> >(w,wall));
+//variables to store coordinates of start and exit
+pair<int,int> start;
+pair<int,int> exit;
+for (int i=0; i<h; ++i) {
+for (int j=0; j<w; ++j) {
+char c = ' ';
+while (!(c=='_' || c=='@' || c=='*'))
+cin >> c;
+if (c == '_') {
+maze[i][j] = make_pair(INT_MAX, 0);
+}
+if (c == '*') {
+maze[i][j] = make_pair(0,0);
+start = make_pair(i,j);
+}
+if ((i==0 || i==h-1) && c == '_') {
+exit = make_pair(i,j);
+}
+if ((j==0 || j==w-1) && c == '_') {
+exit = make_pair(i,j);
+}
+}
+}
+//dijkstra algorithm (modified: not distance but cost) (cost=number of used Shortcuts)
+//map to store predecessors
+map<pair<int,int>,pair<int,int> > pred;
+//priority queue ordered by cost
+set<pair<int,pair<int,int> > > pq;
+pq.insert(make_pair(0,start));
+while (!pq.empty()) {
+pair<int,int> next = pq.begin()->second;
+int x = next.first;
+int y = next.second;
+pq.erase(pq.begin());
+//check for all neighbors (up, down, left right)
+//if shortcut -> check next field in same direction
+if ((x<h-1 && maze[x+1][y] != wall && maze[x+1][y].first >= maze[x][y].first+1) ||
+(x<h-2 && maze[x+1][y] == wall && maze[x+2][y] != wall && maze[x+2][y].first > maze[x][y].first+1)) {
+if (maze[x+1][y] == wall) {
+if (maze[x][y].second<3) {
+pq.erase(make_pair(maze[x+2][y].second, make_pair(x+2,y)));
+maze[x+2][y].first = maze[x][y].first+1;
+maze[x+2][y].second = maze[x][y].second+1;
+pq.insert(make_pair(maze[x+2][y].second, make_pair(x+2,y)));
+pred[make_pair(x+2,y)] = make_pair(x,y);
+}
+}
+else {
+pq.erase(make_pair(maze[x+1][y].second, make_pair(x+1,y)));
+maze[x+1][y].first = maze[x][y].first+1;
+maze[x+1][y].second = maze[x][y].second;
+pq.insert(make_pair(maze[x+1][y].second, make_pair(x+1,y)));
+pred[make_pair(x+1,y)] = make_pair(x,y);
+}
+}
+
+if ((x>0 && maze[x-1][y] != wall && maze[x-1][y].first >= maze[x][y].first+1) ||
+(x>1 && maze[x-1][y] == wall && maze[x-2][y] != wall && maze[x-2][y].first > maze[x][y].first+1)) {
+if (maze[x-1][y] == wall) {
+if (maze[x][y].second<3) {
+pq.erase(make_pair(maze[x-2][y].second, make_pair(x-2,y)));
+maze[x-2][y].first = maze[x][y].first+1;
+maze[x-2][y].second = maze[x][y].second+1;
+pq.insert(make_pair(maze[x-2][y].second, make_pair(x-2,y)));
+pred[make_pair(x-2,y)] = make_pair(x,y);
+}
+}
+else {
+pq.erase(make_pair(maze[x-1][y].second, make_pair(x-1,y)));
+maze[x-1][y].first = maze[x][y].first+1;
+maze[x-1][y].second = maze[x][y].second;
+pq.insert(make_pair(maze[x-1][y].second, make_pair(x-1,y)));
+pred[make_pair(x-1,y)] = make_pair(x,y);
+}
+}
+if ((y<w-1 && maze[x][y+1] != wall && maze[x][y+1].first >= maze[x][y].first+1) ||
+(y<w-2 && maze[x][y+1] == wall && maze[x][y+2] != wall && maze[x][y+2].first > maze[x][y].first+1)) {
+if (maze[x][y+1] == wall) {
+if (maze[x][y].second<3) {
+pq.erase(make_pair(maze[x][y+2].second, make_pair(x,y+2)));
+maze[x][y+2].first = maze[x][y].first+1;
+maze[x][y+2].second = maze[x][y].second+1;
+pq.insert(make_pair(maze[x][y+2].second, make_pair(x,y+2)));
+pred[make_pair(x,y+2)] = make_pair(x,y);
+}
+}
+else {
+pq.erase(make_pair(maze[x][y+1].second, make_pair(x,y+1)));
+maze[x][y+1].first = maze[x][y].first+1;
+maze[x][y+1].second = maze[x][y].second;
+pq.insert(make_pair(maze[x][y+1].second, make_pair(x,y+1)));
+pred[make_pair(x,y+1)] = make_pair(x,y);
+}
+}
+if ((y>0 && maze[x][y-1] != wall && maze[x][y-1].first >= maze[x][y].first+1) ||
+(y>1 && maze[x][y-1] == wall && maze[x][y-2] != wall && maze[x][y-2].first > maze[x][y].first+1)) {
+if (maze[x][y-1] == wall) {
+if (maze[x][y].second<3) {
+pq.erase(make_pair(maze[x][y-2].second, make_pair(x,y-2)));
+maze[x][y-2].first = maze[x][y].first+1;
+maze[x][y-2].second = maze[x][y].second+1;
+pq.insert(make_pair(maze[x][y-2].second, make_pair(x,y-2)));
+pred[make_pair(x,y-2)] = make_pair(x,y);
+}
+}
+else {
+pq.erase(make_pair(maze[x][y-1].second, make_pair(x,y-1)));
+maze[x][y-1].first = maze[x][y].first+1;
+maze[x][y-1].second = maze[x][y].second;
+pq.insert(make_pair(maze[x][y-1].second, make_pair(x,y-1)));
+pred[make_pair(x,y-1)] = make_pair(x,y);
+}
+}
+}
+
+//backtrack path from exit to start
+pair<int,int> curr = exit;
+pair<int,int> before = exit;
+vector<pair<int,int> > shortcut;
+while (curr != start) {
+before = curr;
+curr = pred[curr];
+if (abs(curr.first - before.first) == 2 || abs(curr.second - before.second) == 2) {
+int x = (curr.first + before.first)/2;
+int y = (curr.second + before.second)/2;
+shortcut.push_back(make_pair(x,y));
+}
+}
+
+int used = shortcut.size();
+for (int i=0; i<3-used; ++i) {
+shortcut.push_back(make_pair(-1,-1));
+}
+
+cout << "Case #" << ti << ":\n";
+for (int i=0; i<shortcut.size(); ++i) {
+if (shortcut[i] == wall) {
+cout << "unused\n";
+}
+else {
+cout << shortcut[i].second+1 << " " << shortcut[i].first+1 << "\n";
+}
+}
+}
+return 0;
+}
+/*
+6
+5 5
+@@@@@@__*@@_@@@@__@@@@_@@
+8 7
+@@@@@@@@_______@@@@@@@_@@______@@_@@@@@@@____*_@@@@@@@@@
+10 10
+@@@@@@@@@@
+@@@______@
+@@@@@_@_@@
+@_@@___@_@
+__@@@_@__@
+@_@_____@@
+@___@@__@@
+@_@@_@@@*@
+@________@
+@@@@@@@@@@
+
+8 5 @@@@@@_@ @@@__*_@ @@@@@__@ @@@@@__@ @@@@@@@@
+7 6 @@@@@@@ @*___@@ @@___@@ ____@@@ @@@@@@@ @@@@@@@
+8 5 @@@@@@@@ @____@@@ @__@__@@ @*@_@_@@ @@@@@_@@
+*/
+/*
+1 8 8
+@@@@@@@@
+@@@@_@@@
+@__@__*@
+@@___@@@
+@__@_@_@
+@@_@@__@
+@_____@@
+@_@@@@@@
+*/
+/*
+1 8 11
+@@@@@@@@
+@*_____@
+@@_____@
+@_@____@
+@@@____@
+@_@____@
+@@@____@
+@_@____@
+@@@____@
+@______@
+@_@@@@@@
+
+*/
+
+
+
+
+
+
+
+
