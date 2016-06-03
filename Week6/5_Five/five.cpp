@@ -20,8 +20,6 @@ block rotateBlock(block b) {
     return r;
 }
 
-//Height:board[0].size()
-//Width: board.size()
 vector<vector<int>> insertBlock(vector<vector<int>> brd, vector<vector<int>> block, int horOffset) {
     int insertPosition = 0;
     
