@@ -41,7 +41,9 @@ int main() {
         //dijkstra for future
         set<pair<int,int>> pq;
         vector<int> dist(n+1, INT_MAX);
+        vector<int> pred(n+1);
         pq.insert({0,g});
+        pred[g] = -1;
         dist[g] = 0;
         while (!pq.empty()) {
             int next = pq.begin()->second;
@@ -53,12 +55,19 @@ int main() {
                     pq.erase({dist[item.b],item.b});
                     dist[item.b] = dist[next]+item.l;
                     pq.insert({dist[item.b],item.b});
+                    pred[item.b] = next;
                 }
             }
         }
         int distFuture = dist[0];
+        vector<bool> usedNodes(n+1);
+        int curr = pred[0];
+        while (curr != -1) {
+            usedNodes[curr] = true;
+            curr = pred[curr];
+        }
         
-        vector<vector<int>> dp(n+1, vector<int>(distFuture));
+        vector<vector<int>> dp(n+1, vector<int>(distFuture,-1));
         dp[n][0] = o[n];
         for (int i=n; i>=0; --i) {
             for (int j=0; j<distFuture; ++j) {
@@ -72,14 +81,14 @@ int main() {
             }
         }
         
-        int result = 0;
+        int result = -1;
         for (int i=0; i<distFuture; ++i) {
             if (dp[0][i] > result) result = dp[0][i];
         }
         
         
         cout << "Case #" << ti << ": ";
-        if (result == 0) {
+        if (result == -1) {
             cout << "impossible\n";
         }
         else {
