@@ -14,10 +14,10 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "E9B718E81CF630DB00272307"
-               BuildableName = "4_Four"
-               BlueprintName = "4_Four"
-               ReferencedContainer = "container:Week7.xcodeproj">
+               BlueprintIdentifier = "E9BD75021D0E7F9A00C1C0A8"
+               BuildableName = "MakeTest"
+               BlueprintName = "MakeTest"
+               ReferencedContainer = "container:Week9.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -29,15 +29,6 @@
       shouldUseLaunchSchemeArgsEnv = "YES">
       <Testables>
       </Testables>
-      <MacroExpansion>
-         <BuildableReference
-            BuildableIdentifier = "primary"
-            BlueprintIdentifier = "E9B718E81CF630DB00272307"
-            BuildableName = "4_Four"
-            BlueprintName = "4_Four"
-            ReferencedContainer = "container:Week7.xcodeproj">
-         </BuildableReference>
-      </MacroExpansion>
       <AdditionalOptions>
       </AdditionalOptions>
    </TestAction>
@@ -51,16 +42,15 @@
       debugDocumentVersioning = "YES"
       debugServiceExtension = "internal"
       allowLocationSimulation = "YES">
-      <BuildableProductRunnable
-         runnableDebuggingMode = "0">
+      <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "E9B718E81CF630DB00272307"
-            BuildableName = "4_Four"
-            BlueprintName = "4_Four"
-            ReferencedContainer = "container:Week7.xcodeproj">
+            BlueprintIdentifier = "E9BD75021D0E7F9A00C1C0A8"
+            BuildableName = "MakeTest"
+            BlueprintName = "MakeTest"
+            ReferencedContainer = "container:Week9.xcodeproj">
          </BuildableReference>
-      </BuildableProductRunnable>
+      </MacroExpansion>
       <AdditionalOptions>
       </AdditionalOptions>
    </LaunchAction>
@@ -70,16 +60,15 @@
       savedToolIdentifier = ""
       useCustomWorkingDirectory = "NO"
       debugDocumentVersioning = "YES">
-      <BuildableProductRunnable
-         runnableDebuggingMode = "0">
+      <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "E9B718E81CF630DB00272307"
-            BuildableName = "4_Four"
-            BlueprintName = "4_Four"
-            ReferencedContainer = "container:Week7.xcodeproj">
+            BlueprintIdentifier = "E9BD75021D0E7F9A00C1C0A8"
+            BuildableName = "MakeTest"
+            BlueprintName = "MakeTest"
+            ReferencedContainer = "container:Week9.xcodeproj">
          </BuildableReference>
-      </BuildableProductRunnable>
+      </MacroExpansion>
    </ProfileAction>
    <AnalyzeAction
       buildConfiguration = "Debug">
