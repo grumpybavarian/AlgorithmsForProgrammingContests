@@ -1,15 +1,22 @@
-//
-//  main.cpp
-//  3_Three
-//
-//  Created by Thomas Edlich on 29/06/16.
-//  Copyright © 2016 Thomas Edlich. All rights reserved.
-//
-
 #include <iostream>
+#include <vector>
+#include <algorithm>
+using namespace std;
 
-int main(int argc, const char * argv[]) {
-    // insert code here...
-    std::cout << "Hello, World!\n";
+struct Point {
+    int x,y,z;
+};
+
+struct Line {
+    int x,y,z;
+};
+
+int main() {
+    int t;
+    cin >> t;
+    for (int ti=1; ti<=t; ++ti) {
+        
+        cout << "Case #" << ti << ": " << -1 << "\n";
+    }
     return 0;
 }
