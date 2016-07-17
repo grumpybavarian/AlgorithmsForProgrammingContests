@@ -527,6 +527,7 @@
 				E9C832CF1D2A6E5C0077DA6C /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		E9C832D81D2A6E650077DA6C /* Build configuration list for PBXNativeTarget "2_Two" */ = {
 			isa = XCConfigurationList;
@@ -535,6 +536,7 @@
 				E9C832DA1D2A6E650077DA6C /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		E9C832E31D2A6E6A0077DA6C /* Build configuration list for PBXNativeTarget "3_Three" */ = {
 			isa = XCConfigurationList;
@@ -543,6 +545,7 @@
 				E9C832E51D2A6E6A0077DA6C /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		E9C832EE1D2A6E710077DA6C /* Build configuration list for PBXNativeTarget "4_Four" */ = {
 			isa = XCConfigurationList;
@@ -551,6 +554,7 @@
 				E9C832F01D2A6E710077DA6C /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		E9C832F91D2A6E760077DA6C /* Build configuration list for PBXNativeTarget "5_Five" */ = {
 			isa = XCConfigurationList;
@@ -559,6 +563,7 @@
 				E9C832FB1D2A6E760077DA6C /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
