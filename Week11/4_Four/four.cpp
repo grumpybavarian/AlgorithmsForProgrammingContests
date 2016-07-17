@@ -5,6 +5,7 @@
 #include <set>
 #include <climits>
 #include <string>
+#include <time.h>
 using namespace std;
 
 struct Point {
@@ -14,6 +15,8 @@ struct Line {
     Point a,b;
     int id;
 };
+
+#define errPoint Point{-1,-1}
 
 bool pointEqual(Point a, Point b) {
     return a.x == b.x && a.y == b.y;
@@ -74,60 +77,36 @@ Point intersection(Line a, Line b) {
     }
 }
 
-//http://rosettacode.org/wiki/Combinations#C.2B.2B
 Point commonIntersection(vector<Line> lines, int k) {
+    vector<bool> intersecToCheck(lines.size(),true);
     
-    vector<bool> bitmask(lines.size());
-    for (int i=0; i<k; ++i) bitmask[i] = true;
-    bool possible = true;
-    int failedIndex = 0;
-    do {
-        if (!possible) {
-            while (bitmask[failedIndex]) {
-                if (!prev_permutation(bitmask.begin(), bitmask.end())) {
-                    return Point {-1,-1};
-                }
-            }
-        }
-        possible = true;
-        //find intersection point
-        int c = 0,j = 0;
-        Line a,b;
-        while (c < 2) {
-            if (bitmask[j]) {
-                if (c == 0) a = lines[j];
-                else b = lines[j];
-                ++c;
-            }
-            ++j;
-        }
-        Point p = intersection(a, b);
-        if (p.x < 0 || p.x > 1000 || p.y < 0 || p.y > 1000) continue;
-        for (int i=j; i<lines.size(); ++i) {
-            Line l = lines[i];
-            if (bitmask[i]) {
-                //check if point is on line
+    for (int i=0; i<lines.size()-k; ++i) {
+        for (int j=i+1; j<lines.size(); ++j) {
+            if (!intersecToCheck[j]) continue;
+            Point p = intersection(lines[i],lines[j]);
+            if (p.x == -1) continue;
+            int count = 2;
+            for (int m=j+1; m<lines.size(); ++m) {
+                Line l = lines[m];
                 double crossproduct = (p.y-l.a.y)*(l.b.x-l.a.x) - (p.x-l.a.x)*(l.b.y-l.a.y);
-                if (fabs(crossproduct) >= 1e-9) {
-                    possible = false;
-                    failedIndex = i;
-                    break;
-                }
-                if (!onSegment(l.a, p, l.b)) {
-                    possible = false;
-                    failedIndex = i;
-                    break;
-                }
+                if (fabs(crossproduct) > 1e-6) continue;
+                if (!onSegment(l.a, p, l.b)) continue;
+                ++count;
+                intersecToCheck[m] = false;
+            }
+            if (count >= k) {
+                return p;
             }
         }
-        if (possible) return p;
-    } while (prev_permutation(bitmask.begin(), bitmask.end()));
+        intersecToCheck = vector<bool>(lines.size(), true);
+    }
     
     return Point {-1,-1};
 }
 
 
 int main() {
+    srand(time(0));
     ios_base::sync_with_stdio(false);
     int t;
     cin >> t;
@@ -135,7 +114,6 @@ int main() {
         int n,k;
         cin >> n >> k;
         vector<Line> lines(n);
-        set<pair<double,double>> intersections;
         for (int i=0; i<n; ++i) {
             double a,b,c,d;
             cin >> a >> b >> c >> d;
@@ -166,9 +144,29 @@ int main() {
                 d = b + fac2*dir.second;
             }
             lines[i] = Line {Point {a,b}, Point {c,d}, i};
-            intersections.insert({a,b});
         }
-        Point c = commonIntersection(lines, k);
+        Point c = {-1,-1};
+        
+        for (int z=0; z<200; ++z) {
+            int a = rand() % n;
+            int b = rand() % n;
+            while (a == b) b = rand() % n;
+            Point p = intersection(lines[a], lines[b]);
+            int count = 0;
+            for (int i=0; i<n; ++i) {
+                Line l = lines[i];
+                double crossproduct = (p.y-l.a.y)*(l.b.x-l.a.x) - (p.x-l.a.x)*(l.b.y-l.a.y);
+                if (fabs(crossproduct) > 1e-6) continue;
+                if (!onSegment(l.a, p, l.b)) continue;
+                ++count;
+                if (count >= k) break;
+            }
+            if (count >= k) {
+                c = p;
+                break;
+            }
+        }
+        
         
         if (c.x == -1) {
             cout << "Case #" << ti << ": no\n";
